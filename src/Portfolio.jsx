@@ -54,22 +54,58 @@ const languages = [
 
 const projects = [
   {
-    title: '[YOUR PROJECT TITLE 1]',
+    id: 'di4d',
+    title: 'DI4D Platform',
     description:
-      '[SHORT DESCRIPTION] — e.g. A full-stack web application that allows users to track their daily habits and visualise their progress over time.',
-    stack: ['React', 'Node.js', 'MongoDB'],
+      'A web platform developed as part of my studies, built collaboratively in an agile team. Focused on delivering a full-stack solution with a clean UI and robust backend.',
+    stack: ['React', 'C#', '.NET', 'SQL', 'Azure DevOps'],
+    github: null,
+    live: null,
+    details: {
+      overview:
+        'The DI4D Platform is a full-stack web application developed as a team project during my studies at Thomas More. The project followed an agile workflow with sprints, code reviews, and continuous integration, mirroring real-world software engineering practices.',
+      role:
+        'Full-Stack Developer — responsible for designing and implementing both frontend components and backend API endpoints, as well as contributing to database design and sprint planning.',
+      highlights: [
+        'Built RESTful API endpoints with ASP.NET Core (C#)',
+        'Developed interactive React components and page flows',
+        'Managed relational data with SQL and Entity Framework',
+        'Collaborated in an agile team tracked via Azure DevOps',
+        'Participated in code reviews and pair programming sessions',
+      ],
+    },
   },
   {
-    title: '[YOUR PROJECT TITLE 2]',
+    id: 'portfolio',
+    title: 'Portfolio Website',
     description:
-      '[SHORT DESCRIPTION] — e.g. A mobile-friendly weather dashboard that fetches live data from an external API and displays forecasts.',
-    stack: ['Vue.js', 'Tailwind CSS', 'REST API'],
+      'This personal portfolio site — a single-page React app built with Vite and styled with Tailwind CSS, showcasing my skills, projects, and experience.',
+    stack: ['React', 'Vite', 'Tailwind CSS', 'Node.js'],
+    github: 'https://github.com/GovartPeijnenborg/Portfolio',
+    live: null,
+    details: {
+      overview:
+        'A fully responsive personal portfolio website built from scratch. Designed and developed solo, it features smooth page transitions, skill progress bars, a downloadable CV, and detailed project pages. Built with Vite for fast development and optimised production builds.',
+      role:
+        'Solo Developer & Designer — designed the full layout, implemented all React components, and configured the Vite build pipeline.',
+      highlights: [
+        'Component-based architecture with functional React and hooks',
+        'Entirely styled with Tailwind CSS utility classes and a custom theme',
+        'CV auto-generation script written in Node.js (generate-cv.mjs)',
+        'Responsive design that works seamlessly on mobile and desktop',
+        'Hosted publicly via GitHub',
+      ],
+    },
   },
   {
-    title: '[YOUR PROJECT TITLE 3]',
+    id: 'placeholder',
+    title: 'Next Project — Coming Soon',
     description:
-      '[SHORT DESCRIPTION] — e.g. A command-line tool written in Python that automates file organisation on your desktop.',
-    stack: ['Python', 'Click', 'OS module'],
+      'Something new is in the works. Check back later to see what I\'m building next.',
+    stack: [],
+    github: null,
+    live: null,
+    details: null,
   },
 ]
 
@@ -77,6 +113,10 @@ const projects = [
 
 function Navbar({ currentPage, setCurrentPage }) {
   const links = ['Home', 'About Me', 'Projects']
+  const isActive = (link) => {
+    if (link === 'Projects') return currentPage === 'Projects' || currentPage === 'ProjectDetail'
+    return currentPage === link
+  }
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-sm border-b border-lavender/50">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
@@ -87,10 +127,10 @@ function Navbar({ currentPage, setCurrentPage }) {
           {links.map((link) => (
             <li key={link}>
               <button
-                onClick={() => link !== 'Projects' && setCurrentPage(link)}
+                onClick={() => setCurrentPage(link)}
                 className={`transition-colors duration-200 hover:text-primary ${
-                  currentPage === link ? 'text-primary font-semibold' : 'text-dark'
-                } ${link === 'Projects' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  isActive(link) ? 'text-primary font-semibold' : 'text-dark'
+                }`}
               >
                 {link}
               </button>
@@ -505,37 +545,130 @@ function CVPage() {
 
 /* ───────── Projects ───────── */
 
-function ProjectsPage() {
+function ProjectsPage({ setCurrentPage, setSelectedProject }) {
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
       <h2 className="text-3xl font-bold mb-10 text-center text-dark">My Projects</h2>
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project, idx) => (
+        {projects.map((project) => (
           <div
-            key={idx}
+            key={project.id}
             className="bg-white rounded-2xl p-6 flex flex-col justify-between border border-lavender/40
                        hover:ring-2 hover:ring-primary/50 transition shadow-lg"
           >
             <div className="space-y-4">
               <h3 className="text-xl font-bold text-dark">{project.title}</h3>
-              <p className="text-muted text-sm leading-relaxed">
-                {project.description}
-              </p>
+              <p className="text-muted text-sm leading-relaxed">{project.description}</p>
               <div className="flex flex-wrap gap-2">
                 {project.stack.map((tech) => (
                   <Badge key={tech} text={tech} />
                 ))}
               </div>
             </div>
-            <a
-              href="#"
-              className="mt-6 inline-block text-center px-5 py-2.5 rounded-lg bg-primary text-white font-semibold
-                         hover:bg-secondary transition-colors duration-200"
-            >
-              View Project
-            </a>
+            {project.details ? (
+              <button
+                onClick={() => { setSelectedProject(project); setCurrentPage('ProjectDetail') }}
+                className="mt-6 w-full text-center px-5 py-2.5 rounded-lg bg-primary text-white font-semibold
+                           hover:bg-secondary transition-colors duration-200"
+              >
+                View Details →
+              </button>
+            ) : (
+              <span className="mt-6 w-full inline-block text-center px-5 py-2.5 rounded-lg bg-lavender/40 text-muted font-semibold cursor-not-allowed">
+                Coming Soon
+              </span>
+            )}
           </div>
         ))}
+      </div>
+    </section>
+  )
+}
+
+/* ───────── Project Detail ───────── */
+
+function ProjectDetailPage({ project, setCurrentPage }) {
+  if (!project) return null
+  return (
+    <section className="max-w-4xl mx-auto px-6 py-16">
+      <button
+        onClick={() => setCurrentPage('Projects')}
+        className="mb-8 flex items-center gap-2 text-primary font-medium hover:underline"
+      >
+        ← Back to Projects
+      </button>
+      <div className="bg-white rounded-2xl shadow-xl border border-lavender/40 p-8 md:p-12 space-y-10">
+        {/* Header */}
+        <div>
+          <h2 className="text-3xl font-bold text-dark">{project.title}</h2>
+          <div className="flex flex-wrap gap-2 mt-4">
+            {project.stack.map((tech) => (
+              <Badge key={tech} text={tech} />
+            ))}
+          </div>
+        </div>
+
+        {/* Overview */}
+        <div>
+          <h3 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+            <span className="w-1.5 h-5 rounded-full bg-gradient-to-b from-primary to-secondary inline-block" />
+            Overview
+          </h3>
+          <p className="text-muted leading-relaxed">{project.details.overview}</p>
+        </div>
+
+        {/* Role */}
+        <div>
+          <h3 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+            <span className="w-1.5 h-5 rounded-full bg-gradient-to-b from-primary to-secondary inline-block" />
+            My Role
+          </h3>
+          <p className="text-muted leading-relaxed">{project.details.role}</p>
+        </div>
+
+        {/* Highlights */}
+        <div>
+          <h3 className="text-lg font-semibold text-primary mb-3 flex items-center gap-2">
+            <span className="w-1.5 h-5 rounded-full bg-gradient-to-b from-primary to-secondary inline-block" />
+            Key Highlights
+          </h3>
+          <ul className="space-y-3">
+            {project.details.highlights.map((h, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="mt-0.5 w-5 h-5 rounded-full bg-primary/15 text-primary text-xs flex items-center justify-center flex-shrink-0">✓</span>
+                <span className="text-muted text-sm leading-relaxed">{h}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Links */}
+        {(project.github || project.live) && (
+          <div className="flex flex-wrap gap-4 pt-2">
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2.5 rounded-lg border-2 border-primary text-primary font-semibold
+                           hover:bg-primary hover:text-white transition-colors duration-200"
+              >
+                View on GitHub →
+              </a>
+            )}
+            {project.live && (
+              <a
+                href={project.live}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2.5 rounded-lg bg-primary text-white font-semibold
+                           hover:bg-secondary transition-colors duration-200"
+              >
+                Live Demo →
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </section>
   )
@@ -568,6 +701,7 @@ function Footer() {
 
 export default function Portfolio() {
   const [currentPage, setCurrentPage] = useState('Home')
+  const [selectedProject, setSelectedProject] = useState(null)
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-lavender/10">
@@ -584,7 +718,10 @@ export default function Portfolio() {
           <CVPage />
         </PageWrapper>
         <PageWrapper visible={currentPage === 'Projects'}>
-          <ProjectsPage />
+          <ProjectsPage setCurrentPage={setCurrentPage} setSelectedProject={setSelectedProject} />
+        </PageWrapper>
+        <PageWrapper visible={currentPage === 'ProjectDetail'}>
+          <ProjectDetailPage project={selectedProject} setCurrentPage={setCurrentPage} />
         </PageWrapper>
       </main>
 
